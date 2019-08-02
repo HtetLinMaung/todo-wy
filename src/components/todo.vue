@@ -3,13 +3,13 @@
         <div v-if="temp == null" >
             <b-form-input v-model="search" placeholder="Search"></b-form-input>
         </div>
-        <div v-for="todo in todos" :key="todo.title">
+        <div v-for="(todo, index) in todos" :key="index">
             
             <div>
                 Title: {{todo.title}}
                 Description: {{todo}}
                 <button>edit</button>
-                <button @click="deleteTodo(todo.title)">delete</button>
+                <button @click="deleteTodo(todo )">delete</button>
                 <div v-if="todo.done == false"><font color="red">On Going</font></div>
                 <div v-if="todo.done == true"><font color="green">Finished!</font></div>
                 <br>
@@ -30,7 +30,7 @@ export default {
     },
     methods: {
         deleteTodo(todo) {
-        const todoIndex = this.title;
+        const todoIndex = this.todos.indexOf(todo);
         this.todos.splice(todoIndex, 1);
         },
     },
