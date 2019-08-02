@@ -12,7 +12,7 @@
                 Description: {{todo.detail}}
                 <button>edit</button>
                 <button @click="deleteTodo(todo)">delete</button>
-                <div v-if="todo.done == false"><font color="red">On Going</font></div>
+                <div v-if="todo.done == false" @click="complete(todo)"><font color="red">On Going</font></div>
                 <div v-if="todo.done == true"><font color="green">Finished!</font></div>
                 <br>
             </div>
@@ -45,6 +45,12 @@ export default {
                 done: false,
             });
         },
+        complete(todo){
+            const todoIndex = this.todos.indexOf(todo);
+            console.log(this.todos.indexOf(todo))
+            this.todos[todoIndex].done = true;
+            alert("success!")
+        }
     },
 }
 </script>
