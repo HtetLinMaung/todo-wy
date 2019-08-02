@@ -1,15 +1,17 @@
 <template>
     <div>
         <div v-if="temp == null" >
-            <b-form-input v-model="search" placeholder="Search"></b-form-input>
+            <b-form-input v-model="title" placeholder="Title"></b-form-input>
+            <b-form-input v-model="detail" placeholder="Detail"></b-form-input>
+            <b-button @click="addtodo()">ADD</b-button>
         </div>
         <div v-for="(todo, index) in todos" :key="index">
             
             <div>
                 Title: {{todo.title}}
-                Description: {{todo}}
+                Description: {{todo.detail}}
                 <button>edit</button>
-                <button @click="deleteTodo(todo )">delete</button>
+                <button @click="deleteTodo(todo)">delete</button>
                 <div v-if="todo.done == false"><font color="red">On Going</font></div>
                 <div v-if="todo.done == true"><font color="green">Finished!</font></div>
                 <br>
@@ -30,8 +32,18 @@ export default {
     },
     methods: {
         deleteTodo(todo) {
+            console.log(todo)
         const todoIndex = this.todos.indexOf(todo);
         this.todos.splice(todoIndex, 1);
+        },   
+        addtodo() {
+            const title = this.detail;
+            const detail = this.detail;
+            this.todos.push({
+                title,
+                detail,
+                done: false,
+            });
         },
     },
 }
