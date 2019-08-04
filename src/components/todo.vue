@@ -1,8 +1,12 @@
 <template>
   <b-container>
-    <div v-if="temp.length" class="text-left">
-      <b-form-input v-model.lazy="search" id="input-small" size="md" placeholder="Search"></b-form-input>
-    </div>
+    <b-row>
+        <b-col class="mb-4">
+      <div class="text-left">
+        <b-form-input v-model.lazy="search" id="input-small" size="md" placeholder="Search"></b-form-input>
+      </div>
+      </b-col>
+    </b-row>
     <b-row class="mb-4">
       <b-col>
         <b-button
@@ -79,7 +83,6 @@ export default {
   data() {
     return {
       search: "",
-      temp: null,
       title: null,
       description: null,
       editTodo: null,
