@@ -91,7 +91,7 @@ export default {
         // },
         updateTodo(todoedit){
             axios
-            .put("http://localhost:8000/todo/" + todoedit.id,{
+            .put(`http://localhost:8000/todo/${todoedit.id}/`,{
                 title: todoedit.title,
                 description: todoedit.description,
             })
