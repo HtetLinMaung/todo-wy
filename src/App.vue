@@ -15,24 +15,10 @@ export default {
   },
   data(){
     return {
-      todos: []
-      // todos: [
-      //   {title: "onetodo1", detail: "todo list One", done: false},
-      //   {title: "towtodo2", detail: "todo list Two", done: false},
-      //   {title: "threetodo3", detail: "todo list Three", done: true},
-      // ]
+      todos: [],
     }
   },  
-  // mounted () {
-  //   axios.get('http://localhost:8000/todo/')
-  //       .then(res => {
-  //         this.todos = res;
-  //       console.log(todos);
-  //     })
-  //     .catch(err => {
-  //       console.log(err);
-  //     });
-  // }
+
   mounted(){
     fetch("http://localhost:8000/todo/")
     .then(response => response.json())
