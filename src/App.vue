@@ -6,7 +6,8 @@
 
 <script>
 import Todo from './components/todo.vue'
-
+import axios from 'axios'
+ 
 export default {
   name: 'app',
   components: {
@@ -14,12 +15,30 @@ export default {
   },
   data(){
     return {
-      todos: [
-        {title: "onetodo1", detail: "todo list One", done: false},
-        {title: "towtodo2", detail: "todo list Two", done: false},
-        {title: "threetodo3", detail: "todo list Three", done: true},
-      ]
+      todos: []
+      // todos: [
+      //   {title: "onetodo1", detail: "todo list One", done: false},
+      //   {title: "towtodo2", detail: "todo list Two", done: false},
+      //   {title: "threetodo3", detail: "todo list Three", done: true},
+      // ]
     }
+  },  
+  // mounted () {
+  //   axios.get('http://localhost:8000/todo/')
+  //       .then(res => {
+  //         this.todos = res;
+  //       console.log(todos);
+  //     })
+  //     .catch(err => {
+  //       console.log(err);
+  //     });
+  // }
+  mounted(){
+    fetch("http://localhost:8000/todo/")
+    .then(response => response.json())
+    .then((data) => {
+      this.todos = data;
+    })
   }
 }
 </script>
