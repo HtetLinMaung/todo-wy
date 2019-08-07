@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Todo :todos="todos"/>
+    <Todo />
   </div>
 </template>
 
@@ -19,13 +19,7 @@ export default {
     }
   },  
 
-  mounted(){
-    fetch("http://localhost:8000/todo/")
-    .then(response => response.json())
-    .then((data) => {
-      this.todos = data;
-    })
-  }
+  
 }
 </script>
 
