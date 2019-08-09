@@ -211,8 +211,9 @@ export default {
       this.totalRows = this.todos.length;
     },
     autoReload() {
+      const self = this;
       setInterval(function() {
-        this.fetchData();
+        self.fetchData();
       }, 1000);
     },
     fetchData() {
@@ -260,9 +261,7 @@ export default {
   },
   mounted() {
     const self = this;
-    setInterval(function() {
-        self.fetchData();
-      }, 10000);
+        self.autoReload();
   }
 };
 </script>
