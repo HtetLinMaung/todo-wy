@@ -44,7 +44,11 @@
       >
         <b-card header-tag="header" :class="{true:todo.done}" footer-tag="footer">
           <h6 slot="header" class="mb-0">
-            <b-form-checkbox v-model="todo.done" switches @change="updateTodo(todo)">{{todo.title}}</b-form-checkbox>
+            <b-form-checkbox
+              v-model="todo.done"
+              switches
+              @change="updateTodo(todo, todo.done = !todo.done)"
+            >{{todo.title}}</b-form-checkbox>
           </h6>
           <b-card-text>{{todo.description}}</b-card-text>
           <b-button
@@ -101,7 +105,6 @@ export default {
       todos: [],
       title: null,
       description: null,
-      editTodo: null,
       showAddNew: false,
       showEdit: false,
       todoedit: "",
@@ -109,7 +112,6 @@ export default {
       done: "",
       start: 0,
       end: null,
-      paginatedItems: null,
       currentPage: 2,
       perPage: 6,
       totalRows: null,
@@ -120,57 +122,55 @@ export default {
   },
   methods: {
     deleteTodo(id) {
-      // let index = this.origin_todos.findIndex(todo => todo.id == id);
-      // this.origin_todos.splice(index, 1);
-      // index = this.todos.findIndex(todo => todo.id == id);
-      // this.todos.splice(index, 1);
-      let collections = [this.origin_todos, this.todos];
-      collections = collections.map(collection => {
-        return collection.splice(collection.findIndex(obj => obj.id == id), 1);
-      });
-      
-      this.totalRows = this.todos.length;
+      let index = this.origin_todos.findIndex(todo => todo.id == id);
+      this.origin_todos.splice(index, 1);
+      index = this.todos.findIndex(todo => todo.id == id);
+      this.todos.splice(index, 1);
+      // let collections = [this.origin_todos, this.todos];
+      // collections = collections.map(collection => {
+      //   return collection.splice(collection.findIndex(obj => obj.id == id), 1);
+      // });
+      this.totalRows = this.todos.length; // update totalRows
 
-      const last_page = Math.ceil(this.todos.length / this.perPage);
+      const last_page = Math.ceil(this.todos.length / this.perPage); // calculate last page
       if ((index + 1) % this.perPage == 1) {
         // if last item in current page
-        this.resetPosition();
+        this.resetPosition(); // re-calculate start and end
       }
 
       fetch(`http://localhost:8000/todo/${id}/`, {
         method: "DELETE"
-      }).then(() => {});
+      });
     },
     updateTodo(todoedit) {
-      axios
-        .put(`http://localhost:8000/todo/${todoedit.id}/`, {
-          title: todoedit.title,
-          description: todoedit.description,
-          done: !todoedit.done
-        })
-        .then(res => {
-          // console.log(todoedit.done);
-        })
-        .catch(err => {
-          console.log(err);
-        });
+      localStorage.setItem("data", JSON.stringify(this.todos));
+      axios.put(`http://localhost:8000/todo/${todoedit.id}/`, {
+        title: todoedit.title,
+        description: todoedit.description,
+        done: todoedit.done
+      });
+      console.log(this.todos);
     },
     addtodo() {
       this.origin_todos.unshift({
+        // add new data as DESC
         title: this.title,
         description: this.description
       });
 
       if (
+        // if search is empty or not empty
         !this.search ||
         (this.search &&
           this.origin_todos[0].title.match(new RegExp(`^${this.search}`, "i")))
       ) {
         this.todos.unshift({
+          // if data in current paginated page are >= than this.perPage
           title: this.title,
           description: this.description
         });
-        if (this.todos.length % 6 != 0) {
+        if (this.todos.length % this.perPage != 0) {
+          // if data in current paginated page are more than this.perPage
           this.totalRows = this.todos.length;
           this.resetPosition();
         }
@@ -199,14 +199,49 @@ export default {
       // console.log(page_size, page_number)
     },
     onPageChanged(page) {
+      // pagination
       this.end = this.perPage * page;
       this.start = this.end - this.perPage;
     },
     resetPosition() {
+      //recalculate start and end
       this.start = 0;
       this.end =
         this.todos.length < this.perPage ? this.todos.length : this.perPage;
       this.totalRows = this.todos.length;
+    },
+    autoReload() {
+      setInterval(function() {
+        this.fetchData();
+      }, 1000);
+    },
+    fetchData() {
+      fetch("http://localhost:8000/todo/")
+        .then(response => response.json())
+        .then(data => {
+          localStorage.setItem("data", JSON.stringify(data));
+          let dataObj = JSON.parse(localStorage.getItem("data"));
+          let newObj = Object.keys(dataObj);
+          let oldObj = Object.keys(data);
+          console.log(dataObj != undefined || newObj.length == oldObj.length);
+          if (newObj.length == oldObj.length) {
+            console.log("Same Data =>");
+            this.origin_todos = dataObj.reverse(); // reverse data
+            this.todos = [...this.origin_todos]; // Destructuring the origin_todos array
+            this.end =
+              dataObj.length < this.perPage ? dataObj.length : this.perPage; // total post
+            this.totalRows = dataObj.length;
+          } // else {
+          //   console.log(data);
+          //   console.log("Change Data =>");
+          //   console.log()
+          //   this.origin_todos = data.reverse(); // reverse data
+          //   this.todos = [...this.origin_todos]; // Destructuring the origin_todos array
+          //   this.end = data.length < this.perPage ? data.length : this.perPage; // total post
+          //   this.totalRows = data.length;
+          // }
+          // window.addEventListener("online", this.autoReload());
+        });
     }
   },
   watch: {
@@ -217,21 +252,17 @@ export default {
         );
         this.resetPosition();
       } else {
-        this.todos = this.origin_todos.slice(0, this.origin_todos.length);
+        // this.todos = this.origin_todos.slice(0, this.origin_todos.length);
+        this.todos = [...this.origin_todos]; // Destructuring the orign_todos into new
         this.resetPosition();
       }
     }
   },
   mounted() {
-    fetch("http://localhost:8000/todo/")
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
-        this.origin_todos = data.reverse();
-        this.todos = this.origin_todos.slice(0, this.origin_todos.length);
-        this.end = data.length < this.perPage ? data.length : this.perPage;
-        this.totalRows = data.length;
-      });
+    const self = this;
+    setInterval(function() {
+        self.fetchData();
+      }, 10000);
   }
 };
 </script>
